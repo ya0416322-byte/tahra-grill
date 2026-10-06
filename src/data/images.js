@@ -1,30 +1,30 @@
-// كل الصور من Unsplash ومتأكد منها بالنظر إنها مناسبة للصنف
-const U = (id) => `https://images.unsplash.com/${id}?q=80&w=800&auto=format&fit=crop`;
+// الصور محفوظة محلياً في public/images عشان الموقع ميعتمدش على سيرفرات بره
+const U = (name) => `${import.meta.env.BASE_URL}images/${name}.jpg`;
 
 export const P = {
-  mixGrill: "photo-1555939594-58d7cb561ad1", // صينية مشويات مشكلة على الفحم
-  koftaSkewers: "photo-1603360946369-dc9bb6258143", // أسياخ كفتة/شيش مع عيش
-  tikkaSkewers: "photo-1599487488170-d11ec9c172f0", // أسياخ شيش على الفحم
-  roastChicken: "photo-1598103442097-8b74394b95c6", // فرخة مشوية كاملة
-  grilledChicken: "photo-1532550907401-a500c9a57435", // صدور فراخ مشوية
-  crispyChicken: "photo-1562967914-608f82629710", // فراخ مقرمشة
-  ribs: "photo-1544025162-d76694265947", // ريش/كباب مشوي
-  steak: "photo-1558030006-450675393462", // لحمة مشوية متقطعة
-  mixPlate: "photo-1504674900247-0877df9cc836", // أطباق مشكلة
-  biryani: "photo-1631515243349-e0cb75fb8d3a", // أرز بالفراخ (برياني)
-  biryaniBowls: "photo-1563379091339-03b21ab4a4f8", // أطباق أرز
-  friedRice: "photo-1512058564366-18510be2db19", // طاسة أرز
-  vegRice: "photo-1547592180-85f173990554", // خضار مع أرز
-  soup: "photo-1547592166-23ac45744acd", // شوربة
-  pasta: "photo-1621996346565-e3dbc646d9a9", // مكرونة
-  chickenSandwich: "photo-1606755962773-d324e0a13086", // ساندوتش فراخ مقرمشة
-  wraps: "photo-1626700051175-6818013e1d4f", // ساندوتشات ملفوفة (شيش)
-  baguette: "photo-1550507992-eb63ffee0847", // ساندوتش فينو
-  cheeseSandwich: "photo-1565299507177-b0ac66763828", // ساندوتش جبنة سايحة
-  greenSalad: "photo-1540189549336-e6e99c3679fe", // سلطة خضراء
-  saladBowl: "photo-1512621776951-a57141f2eefd", // طبق سلطة
-  saladBowl2: "photo-1546069901-ba9599a7e63c", // سلطة + طماطم
-  cucumber: "photo-1589621316382-008455b857cd", // خيار (مخلل/سلطة)
+  mixGrill: "mixGrill", // صينية مشويات مشكلة على الفحم
+  koftaSkewers: "koftaSkewers", // أسياخ كفتة/شيش مع عيش
+  tikkaSkewers: "tikkaSkewers", // أسياخ شيش على الفحم
+  roastChicken: "roastChicken", // فرخة مشوية كاملة
+  grilledChicken: "grilledChicken", // صدور فراخ مشوية
+  crispyChicken: "crispyChicken", // فراخ مقرمشة
+  ribs: "ribs", // ريش/كباب مشوي
+  steak: "steak", // لحمة مشوية متقطعة
+  mixPlate: "mixPlate", // أطباق مشكلة
+  biryani: "biryani", // أرز بالفراخ (برياني)
+  biryaniBowls: "biryaniBowls", // أطباق أرز
+  friedRice: "friedRice", // طاسة أرز
+  vegRice: "vegRice", // خضار مع أرز
+  soup: "soup", // شوربة
+  pasta: "pasta", // مكرونة
+  chickenSandwich: "chickenSandwich", // ساندوتش فراخ مقرمشة
+  wraps: "wraps", // ساندوتشات ملفوفة (شيش)
+  baguette: "baguette", // ساندوتش فينو
+  cheeseSandwich: "cheeseSandwich", // ساندوتش جبنة سايحة
+  greenSalad: "greenSalad", // سلطة خضراء
+  saladBowl: "saladBowl", // طبق سلطة
+  saladBowl2: "saladBowl2", // سلطة + طماطم
+  cucumber: "cucumber", // خيار (مخلل/سلطة)
 };
 
 // صورة مناسبة لكل صنف حسب اسمه

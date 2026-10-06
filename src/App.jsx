@@ -3,7 +3,7 @@ import { MENU, CATEGORIES, KILO_MENU, KILO_SIZES, PHONES } from "./data/menu.js"
 import { IMAGES, GALLERY, imgFor } from "./data/images.js";
 import {
   OPEN_FROM, OPEN_TO, MIN_ORDER, DELIVERY_ZONES, EXTRAS, STORY,
-  SOCIALS, FAQS, BOOKING, MAP_QUERY, MAP_DIR, SEED_REVIEWS,
+  SOCIALS, FAQS, BOOKING, MAP_QUERY, MAP_DIR,
 } from "./data/site.js";
 
 function waLink(text) {
@@ -27,7 +27,7 @@ function loadReviews() {
     const raw = localStorage.getItem("tahra-reviews");
     if (raw) return JSON.parse(raw);
   } catch { /* ignore */ }
-  return SEED_REVIEWS;
+  return [];
 }
 
 export default function App() {
@@ -453,6 +453,11 @@ export default function App() {
         <h3 className="font-ruqaa text-3xl text-gold-400 mb-1">⭐ آراء زبايننا</h3>
         <p className="text-orange-100/60 font-bold mb-4">جربتنا؟ سيب رأيك تحت وخلي غيرك يطمن</p>
         <div className="grid md:grid-cols-3 gap-3 mb-5">
+          {reviews.length === 0 && (
+            <p className="md:col-span-3 text-center text-orange-100/50 font-bold py-6 bg-white/5 border border-white/10 rounded-2xl">
+              لسه مفيش تقييمات — جربت الأكل؟ كن أول واحد يقيّم 👇
+            </p>
+          )}
           {reviews.map((r, i) => (
             <div key={`${r.name}-${i}`} className="bg-coal-900/70 border border-white/10 rounded-2xl p-4">
               <div className="flex items-center justify-between">
@@ -704,13 +709,32 @@ export default function App() {
                   <div className="flex justify-between font-black text-xl"><span>الإجمالي</span><span className="text-gold-400">{grandTotal} جنيه</span></div>
                 </div>
                 {belowMin && <p className="text-xs font-black text-red-400">⚠️ الحد الأدنى للطلب {MIN_ORDER} جنيه - زود أصناف عشان نأكد الطلب</p>}
-                <a
-                  href={waLink(orderText())}
-                  target="_blank"
-                  className="block text-center bg-green-600 hover:bg-green-500 font-black py-3 rounded-2xl"
-                >
-                  💬 تأكيد الطلب واتساب
-                </a>
+                {!openNow && <p className="text-xs font-black text-red-400">🔴 المحل قافل دلوقتي (بنفتح {OPEN_FROM} الصبح) - تقدر تحجز صينية لمعاد تاني من قسم الحجز</p>}
+                {(() => {
+                  const missing = !custName.trim() || !custPhone.trim() || (fulfill === "delivery" && !address.trim());
+                  const canOrder = openNow && !belowMin && !missing;
+                  const reason = !openNow
+                    ? "🔴 المحل قافل دلوقتي"
+                    : belowMin
+                      ? `كمّل طلبك لـ ${MIN_ORDER} جنيه`
+                      : "اكتب الاسم والموبايل والعنوان";
+                  return canOrder ? (
+                    <a
+                      href={waLink(orderText())}
+                      target="_blank"
+                      className="block text-center bg-green-600 hover:bg-green-500 font-black py-3 rounded-2xl"
+                    >
+                      💬 تأكيد الطلب واتساب
+                    </a>
+                  ) : (
+                    <div>
+                      <div className="block text-center bg-white/10 text-white/40 font-black py-3 rounded-2xl cursor-not-allowed">
+                        💬 تأكيد الطلب واتساب
+                      </div>
+                      <p className="mt-1.5 text-xs font-black text-gold-400 text-center">{reason}</p>
+                    </div>
+                  );
+                })()}
                 <button onClick={() => setCart({})} className="w-full text-sm font-bold text-white/50 hover:text-white">
                   تفريغ السلة
                 </button>
