@@ -333,6 +333,35 @@ export default function App() {
           ))}
         </div>
 
+        {cat === "mashwyat" ? (
+          <div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {KILO_MENU.filter((r) => !query.trim() || r.name.includes(query.trim())).map((r) => {
+                const nums = r.prices.filter((p) => p !== "-");
+                const min = Math.min(...nums);
+                return (
+                  <div key={r.name} className="card-hover overflow-hidden bg-gradient-to-b from-coal-800 to-coal-900 border border-white/10 rounded-2xl flex flex-col">
+                    <div className="relative h-36">
+                      <img src={imgFor({ name: r.name })} alt={r.name} className="h-full w-full object-cover" loading="lazy" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#1c1110] via-transparent to-transparent" />
+                      <span className="absolute top-2 right-2 text-[11px] font-black bg-gold-500 text-black px-2 py-1 rounded-lg">بالكيلو ⚖️</span>
+                    </div>
+                    <div className="p-4 flex flex-col flex-1">
+                      <h4 className="font-extrabold text-lg leading-snug">{r.name}</h4>
+                      <p className="text-sm text-orange-100/60 font-semibold mt-1 flex-1">يبدأ من {min} ج (⅛ كيلو) لحد {nums[nums.length - 1]} ج (كيلو)</p>
+                      <div className="mt-3 flex items-center justify-between">
+                        <div className="text-2xl font-black text-gold-400">{min} <span className="text-sm">ج</span></div>
+                        <a href="#kilo" className="bg-flame-500 hover:bg-flame-600 font-black px-4 py-2 rounded-xl text-sm glow-btn">
+                          اختار الوزن 👇
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {filtered.filter((m) => m.cat !== "sawany" || cat === "sawany" || cat === "all").map((m) => (
             <div key={m.id} className="card-hover overflow-hidden bg-gradient-to-b from-coal-800 to-coal-900 border border-white/10 rounded-2xl flex flex-col">
@@ -362,7 +391,8 @@ export default function App() {
             </div>
           ))}
         </div>
-        {filtered.length === 0 && (
+        )}
+        {filtered.length === 0 && cat !== "mashwyat" && (
           <p className="text-center text-orange-100/60 font-bold py-10">مفيش نتيجة… جرب كلمة تانية</p>
         )}
 
