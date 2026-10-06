@@ -1,4 +1,12 @@
 // ⚠️ الأرقام دي تقديرية - ابعتلي الأرقام الحقيقية وأنا أظبطها في ثانية
+// ===== التعديل من شيت جوجل (لصاحب المكان - من غير كود) =====
+// 1) اعمل نسخة من شيت المنيو بالأعمدة دي: id | cat | name | price | desc | tag | prices
+//    قيم cat المسموحة: wajbat - sawany - sandwich - salatat - talabat
+// 2) من الشيت: File > Share > Publish to web > اختار CSV وانسخ اللينك
+// 3) حط اللينك هنا. لو فاضي الموقع هيشتغل بالأسعار الأصلية.
+// ملحوظة: جدول الكيلوهات بيتعدل من الكود فقط (src/data/menu.js)
+export const MENU_SHEET_CSV = "";
+
 export const OPEN_FROM = 11; // بيفتح 11 الصبح
 export const OPEN_TO = 2; // بيقفل 2 بعد نص الليل
 

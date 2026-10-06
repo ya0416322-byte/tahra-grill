@@ -1,9 +1,9 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { MENU, CATEGORIES, KILO_MENU, KILO_SIZES, PHONES } from "./data/menu.js";
 import { IMAGES, GALLERY, imgFor } from "./data/images.js";
 import {
   OPEN_FROM, OPEN_TO, MIN_ORDER, DELIVERY_ZONES, EXTRAS, STORY,
-  SOCIALS, FAQS, BOOKING, MAP_QUERY, MAP_DIR,
+  SOCIALS, FAQS, BOOKING, MAP_QUERY, MAP_DIR, MENU_SHEET_CSV,
 } from "./data/site.js";
 
 function waLink(text) {
@@ -52,15 +52,55 @@ export default function App() {
   const [rText, setRText] = useState("");
   // فورم حجز الصواني
   const [bk, setBk] = useState({ name: "", phone: "", date: "", guests: "", tray: "s5", qty: 1, notes: "", pay: BOOKING.depositMethods[0] });
+  // المنيو: من شيت جوجل لو متظبط، وإلا من البيانات الأصلية
+  const [liveMenu, setLiveMenu] = useState(MENU);
+  const [menuSrc, setMenuSrc] = useState("built-in");
+
+  useEffect(() => {
+    if (!MENU_SHEET_CSV) return;
+    const parseCSV = (text) => {
+      const rows = [];
+      let cur = [""], inQ = false;
+      for (let i = 0; i < text.length; i++) {
+        const ch = text[i];
+        if (inQ) {
+          if (ch === '"') { if (text[i + 1] === '"') { cur[cur.length - 1] += '"'; i++; } else inQ = false; }
+          else cur[cur.length - 1] += ch;
+        } else if (ch === '"') inQ = true;
+        else if (ch === ",") cur.push("");
+        else if (ch === "\n") { rows.push(cur); cur = [""]; }
+        else if (ch !== "\r") cur[cur.length - 1] += ch;
+      }
+      if (cur.some((c) => c.trim())) rows.push(cur);
+      return rows;
+    };
+    fetch(MENU_SHEET_CSV)
+      .then((r) => { if (!r.ok) throw new Error("sheet"); return r.text(); })
+      .then((text) => {
+        const rows = parseCSV(text).filter((c) => c.length >= 4 && c[2].trim() && !isNaN(Number(c[3])));
+        const hasHeader = rows.length && isNaN(Number(rows[0][3]));
+        const data = (hasHeader ? rows.slice(1) : rows).map((c, i) => ({
+          id: (c[0] || `sheet-${i}`).trim(),
+          cat: (c[1] || "wajbat").trim(),
+          name: c[2].trim(),
+          price: Number(c[3]),
+          desc: (c[4] || "").trim(),
+          tag: (c[5] || "").trim() || undefined,
+          prices: (c[6] || "").trim() || undefined,
+        }));
+        if (data.length) { setLiveMenu(data); setMenuSrc("sheet"); }
+      })
+      .catch(() => { /* يفضل شغال بالبيانات الأصلية */ });
+  }, []);
 
   const filtered = useMemo(() => {
-    return MENU.filter((m) => {
+    return liveMenu.filter((m) => {
       const okCat = cat === "all" || m.cat === cat;
       const q = query.trim();
       const okQ = !q || m.name.includes(q) || m.desc.includes(q);
       return okCat && okQ;
     });
-  }, [cat, query]);
+  }, [cat, query, liveMenu]);
 
   const cartCount = Object.values(cart).reduce((a, b) => a + b.qty, 0);
   const cartTotal = Object.values(cart).reduce((a, b) => a + b.qty * b.price, 0);
@@ -76,7 +116,7 @@ export default function App() {
     setRName(""); setRText(""); setRStars(5);
   };
 
-  const bookingTray = MENU.find((m) => m.id === bk.tray) || MENU[0];
+  const bookingTray = liveMenu.find((m) => m.id === bk.tray) || liveMenu[0];
   const bookingTotal = bookingTray.price * bk.qty;
   const bookingDeposit = Math.round(bookingTotal * BOOKING.depositRate);
   const bookingText = () => {
@@ -265,7 +305,7 @@ export default function App() {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
           <div>
             <h3 className="font-ruqaa text-4xl text-gold-400">المنيو الكامل</h3>
-            <p className="text-orange-100/70 font-bold">دوس على أي صنف عشان تضيفه للسلة وتطلب واتساب</p>
+            <p className="text-orange-100/70 font-bold">دوس على أي صنف عشان تضيفه للسلة وتطلب واتساب{menuSrc === "sheet" && <span className="text-green-400"> • الأسعار محدثة ✅</span>}</p>
           </div>
           <div className="relative w-full md:w-80">
             <input
@@ -331,7 +371,7 @@ export default function App() {
           <h3 className="font-ruqaa text-3xl text-gold-400 mb-1">🥘 ركن الصواني - للعيلة والعزومات</h3>
           <p className="text-orange-100/60 font-bold mb-4">كل الصواني معاها أرز + سلطات + عيش</p>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {MENU.filter((m) => m.cat === "sawany").map((m) => (
+            {liveMenu.filter((m) => m.cat === "sawany").map((m) => (
               <div key={m.id} className="relative overflow-hidden rounded-2xl border border-gold-400/30 bg-gradient-to-b from-[#3a1410] to-coal-900 card-hover">
                 <img src={imgFor(m)} alt={m.name} className="h-40 w-full object-cover" loading="lazy" />
                 <div className="p-5">
@@ -510,7 +550,7 @@ export default function App() {
             <input value={bk.phone} onChange={(e) => setBk({ ...bk, phone: e.target.value })} placeholder="رقم الموبايل" className="bg-black/30 border border-white/15 rounded-xl px-4 py-2.5 font-bold outline-none focus:border-gold-400 placeholder:text-orange-100/40" dir="ltr" />
             <input value={bk.date} onChange={(e) => setBk({ ...bk, date: e.target.value })} placeholder="المعاد (مثال: الجمعة 7 مساءً)" className="bg-black/30 border border-white/15 rounded-xl px-4 py-2.5 font-bold outline-none focus:border-gold-400 placeholder:text-orange-100/40" />
             <select value={bk.tray} onChange={(e) => setBk({ ...bk, tray: e.target.value })} className="bg-black/30 border border-white/15 rounded-xl px-4 py-2.5 font-bold outline-none focus:border-gold-400 text-orange-100">
-              {MENU.filter((m) => m.cat === "sawany").map((m) => (
+              {liveMenu.filter((m) => m.cat === "sawany").map((m) => (
                 <option key={m.id} value={m.id} className="bg-coal-900">{m.name} - {m.price} ج</option>
               ))}
             </select>
